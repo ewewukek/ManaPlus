@@ -43,6 +43,18 @@ class Joystick final
         };
 
         /**
+         * Additional "buttons" for d-pad.
+         */
+        enum
+        {
+            KEY_UP = MAX_BUTTONS,
+            KEY_DOWN,
+            KEY_LEFT,
+            KEY_RIGHT,
+            KEY_LAST = KEY_RIGHT
+        };
+
+        /**
          * Directions, to be used as bitmask values.
          */
         enum
@@ -141,6 +153,7 @@ class Joystick final
     protected:
         unsigned char mDirection;
 
+        unsigned char mHatPosition;
         bool mActiveButtons[MAX_BUTTONS];
 
         SDL_Joystick *mJoystick;
