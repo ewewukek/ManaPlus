@@ -193,6 +193,7 @@ void setConfigDefaults(Configuration &cfg)
 #else
     AddDEF("joystickEnabled", false);
 #endif
+    AddDEF("useHatForMovement", true);
     AddDEF("upTolerance", 100);
     AddDEF("downTolerance", 100);
     AddDEF("leftTolerance", 100);

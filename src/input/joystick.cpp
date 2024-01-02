@@ -58,6 +58,7 @@ Joystick::Joystick(const int no) :
     mButtonsNumber(MAX_BUTTONS),
     mUseInactive(false),
     mHaveHats(false),
+    mUseHatForMovement(true),
     mKeyToAction(),
     mKeyToId(),
     mKeyTimeMap()
@@ -193,6 +194,7 @@ bool Joystick::open()
     mDownTolerance = config.getIntValue("downTolerance" + toString(mNumber));
     mLeftTolerance = config.getIntValue("leftTolerance" + toString(mNumber));
     mRightTolerance = config.getIntValue("rightTolerance" + toString(mNumber));
+    mUseHatForMovement = config.getBoolValue("useHatForMovement");
     mUseInactive = config.getBoolValue("useInactiveJoystick");
 
     return true;
@@ -286,6 +288,8 @@ void Joystick::logic()
                 mHatPosition |= UP;
             else if ((hat & SDL_HAT_DOWN) != 0)
                 mHatPosition |= DOWN;
+            if ((mDirection == 0U) && mUseHatForMovement)
+                mDirection = mHatPosition;
         }
 
         // Buttons
@@ -353,14 +357,17 @@ bool Joystick::buttonPressed(const unsigned char no) const
         return false;
     if (no < MAX_BUTTONS)
         return mActiveButtons[no];
-    if (no == KEY_UP)
-        return (mHatPosition & UP) != 0;
-    if (no == KEY_DOWN)
-        return (mHatPosition & DOWN) != 0;
-    if (no == KEY_LEFT)
-        return (mHatPosition & LEFT) != 0;
-    if (no == KEY_RIGHT)
-        return (mHatPosition & RIGHT) != 0;
+    if (!mUseHatForMovement)
+    {
+        if (no == KEY_UP)
+            return (mHatPosition & UP) != 0;
+        if (no == KEY_DOWN)
+            return (mHatPosition & DOWN) != 0;
+        if (no == KEY_LEFT)
+            return (mHatPosition & LEFT) != 0;
+        if (no == KEY_RIGHT)
+            return (mHatPosition & RIGHT) != 0;
+    }
     return false;
 }
 
@@ -399,7 +406,7 @@ int Joystick::getButtonFromEvent(const SDL_Event &event) const
         return -1;
     if (event.type == SDL_JOYBUTTONDOWN)
         return event.jbutton.button;
-    if (event.type == SDL_JOYHATMOTION)
+    if (!mUseHatForMovement && event.type == SDL_JOYHATMOTION)
     {
         // reading only hat 0
         if (event.jhat.hat != 0)
@@ -435,14 +442,17 @@ bool Joystick::isActionActive(const InputActionT index) const
             if (mActiveButtons[value])
                 return true;
         }
-        if (value == KEY_UP)
-            return (mHatPosition & UP) != 0;
-        if (value == KEY_DOWN)
-            return (mHatPosition & DOWN) != 0;
-        if (value == KEY_LEFT)
-            return (mHatPosition & LEFT) != 0;
-        if (value == KEY_RIGHT)
-            return (mHatPosition & RIGHT) != 0;
+        if (!mUseHatForMovement)
+        {
+            if (value == KEY_UP)
+                return (mHatPosition & UP) != 0;
+            if (value == KEY_DOWN)
+                return (mHatPosition & DOWN) != 0;
+            if (value == KEY_LEFT)
+                return (mHatPosition & LEFT) != 0;
+            if (value == KEY_RIGHT)
+                return (mHatPosition & RIGHT) != 0;
+        }
     }
     return false;
 }
@@ -468,14 +478,17 @@ void Joystick::handleRepeat(const int time)
             if (mActiveButtons[key])
                 repeat = true;
         }
-        if (key == KEY_UP && (mHatPosition & UP) != 0)
-            repeat = true;
-        if (key == KEY_DOWN && (mHatPosition & DOWN) != 0)
-            repeat = true;
-        if (key == KEY_LEFT && (mHatPosition & LEFT) != 0)
-            repeat = true;
-        if (key == KEY_RIGHT && (mHatPosition & RIGHT) != 0)
-            repeat = true;
+        if (!mUseHatForMovement)
+        {
+            if (key == KEY_UP && (mHatPosition & UP) != 0)
+                repeat = true;
+            if (key == KEY_DOWN && (mHatPosition & DOWN) != 0)
+                repeat = true;
+            if (key == KEY_LEFT && (mHatPosition & LEFT) != 0)
+                repeat = true;
+            if (key == KEY_RIGHT && (mHatPosition & RIGHT) != 0)
+                repeat = true;
+        }
         if (repeat)
         {
             int &keyTime = (*it).second;

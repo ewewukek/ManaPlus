@@ -129,6 +129,9 @@ class Joystick final
         int getNumber() const noexcept2 A_WARN_UNUSED
         { return mNumber; }
 
+        void setUseHatForMovement(const bool b)
+        { mUseHatForMovement = b; }
+
         void setUseInactive(const bool b)
         { mUseInactive = b; }
 
@@ -168,6 +171,7 @@ class Joystick final
         int mButtonsNumber;
         bool mUseInactive;
         bool mHaveHats;
+        bool mUseHatForMovement;
 
         KeyToActionMap mKeyToAction;
 

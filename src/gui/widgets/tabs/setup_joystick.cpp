@@ -58,6 +58,11 @@ Setup_Joystick::Setup_Joystick(const Widget2 *const widget) :
     mNamesModel(new NamesModel),
     mNamesDropDown(new DropDown(this, mNamesModel,
         false, Modal_false, nullptr, std::string())),
+    mUseHatForMovementCheckBox(new CheckBox(this,
+        // TRANSLATORS: joystick settings tab checkbox
+        _("Use joystick hat (d-pad) for movement"),
+        config.getBoolValue("useHatForMovement"),
+        nullptr, std::string())),
     mUseInactiveCheckBox(new CheckBox(this,
         // TRANSLATORS: joystick settings tab checkbox
         _("Use joystick if client window inactive"),
@@ -96,10 +101,11 @@ Setup_Joystick::Setup_Joystick(const Widget2 *const widget) :
 
     place(0, 0, mJoystickEnabled, 1, 1);
     place(0, 1, mNamesDropDown, 1, 1);
-    place(0, 2, mUseInactiveCheckBox, 1, 1);
-    place(0, 3, mDetectButton, 1, 1);
-    place(0, 4, mCalibrateLabel, 1, 1);
-    place(0, 5, mCalibrateButton, 1, 1);
+    place(0, 2, mUseHatForMovementCheckBox, 1, 1);
+    place(0, 3, mUseInactiveCheckBox, 1, 1);
+    place(0, 4, mDetectButton, 1, 1);
+    place(0, 5, mCalibrateLabel, 1, 1);
+    place(0, 6, mCalibrateButton, 1, 1);
 
     setDimension(Rect(0, 0, 365, 75));
 }
@@ -186,6 +192,8 @@ void Setup_Joystick::apply()
 
     config.setValue("joystickEnabled", Joystick::isEnabled());
 
+    config.setValue("useHatForMovement", mUseHatForMovementCheckBox->isSelected());
+    joystick->setUseHatForMovement(mUseHatForMovementCheckBox->isSelected());
     config.setValue("useInactiveJoystick", mUseInactiveCheckBox->isSelected());
     joystick->setUseInactive(mUseInactiveCheckBox->isSelected());
 }
