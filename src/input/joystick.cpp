@@ -411,13 +411,15 @@ int Joystick::getButtonFromEvent(const SDL_Event &event) const
         // reading only hat 0
         if (event.jhat.hat != 0)
             return -1;
-        if (event.jhat.value == SDL_HAT_UP)
+        // SDL reports new hat position, not when d-pad button is pressed.
+        // because of that we have to compare it to previously known state.
+        if ((mHatPosition & UP) == 0 && (event.jhat.value & SDL_HAT_UP) != 0)
             return KEY_UP;
-        if (event.jhat.value == SDL_HAT_DOWN)
+        if ((mHatPosition & DOWN) == 0 && (event.jhat.value & SDL_HAT_DOWN) != 0)
             return KEY_DOWN;
-        if (event.jhat.value == SDL_HAT_LEFT)
+        if ((mHatPosition & LEFT) == 0 && (event.jhat.value & SDL_HAT_LEFT) != 0)
             return KEY_LEFT;
-        if (event.jhat.value == SDL_HAT_RIGHT)
+        if ((mHatPosition & RIGHT) == 0 && (event.jhat.value & SDL_HAT_RIGHT) != 0)
             return KEY_RIGHT;
     }
     return -1;
